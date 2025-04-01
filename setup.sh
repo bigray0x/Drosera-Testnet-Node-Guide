@@ -38,8 +38,8 @@ install_dependency() {
 
 # Check for necessary tools
 check_dependency wget
-check_dependency docker
 check_dependency curl
+check_dependency tar
 
 # Function to deploy a Trap contract if needed (example using Foundry)
 generate_trap_address() {
@@ -122,13 +122,16 @@ fi
 
 # Download and extract Drosera Operator binary
 echo "Downloading Drosera Operator..."
-wget https://github.com/drosera-network/releases/latest/download/drosera-operator-linux-x86_64.tar.gz
+LATEST_VERSION=$(curl -s https://api.github.com/repos/drosera-network/releases/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+DOWNLOAD_URL="https://github.com/drosera-network/releases/releases/download/$LATEST_VERSION/drosera-operator-$LATEST_VERSION-x86_64-unknown-linux-gnu.tar.gz"
+
+wget "$DOWNLOAD_URL" -O drosera-operator.tar.gz
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to download Drosera Operator."
+    echo "Error: Failed to download Drosera Operator from $DOWNLOAD_URL."
     exit 1
 fi
 
-tar -xvf drosera-operator-linux-x86_64.tar.gz
+tar -xvf drosera-operator.tar.gz
 if [ $? -ne 0 ]; then
     echo "Error: Failed to extract Drosera Operator."
     exit 1
@@ -178,4 +181,3 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Drosera Operator setup complete! Your environment has been updated to include your variables."
-
