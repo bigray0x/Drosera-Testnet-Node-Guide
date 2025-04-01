@@ -38,13 +38,12 @@ install_dependency() {
 
 # Check for necessary tools
 check_dependency wget
+check_dependency docker
 check_dependency curl
-check_dependency tar
 
 # Function to deploy a Trap contract if needed (example using Foundry)
 generate_trap_address() {
     echo "Deploying a new Trap contract using Foundry..."
-    # Replace "TrapContract" with your actual contract name
     forge create TrapContract --rpc-url "$ETH_RPC_URL" --private-key "$PRIVATE_KEY"
     if [ $? -ne 0 ]; then
         echo "Error: Failed to deploy the Trap contract."
@@ -63,9 +62,7 @@ read -p "Enter your choice (1/2/3): " NETWORK_CHOICE
 case "$NETWORK_CHOICE" in
     1)
         NETWORK="Holesky"
-        # Default Holesky RPC endpoint (you can change this if you use a different provider)
         DEFAULT_RPC="https://ethereum-holesky-rpc.publicnode.com"
-        # Default Drosera Proxy contract for Holesky (from Drosera testnet guide)
         DEFAULT_DROSERA_ADDRESS="0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8"
         ;;
     2)
@@ -122,12 +119,13 @@ fi
 
 # Download and extract Drosera Operator binary
 echo "Downloading Drosera Operator..."
-LATEST_VERSION=$(curl -s https://api.github.com/repos/drosera-network/releases/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
-DOWNLOAD_URL="https://github.com/drosera-network/releases/releases/download/$LATEST_VERSION/drosera-operator-$LATEST_VERSION-x86_64-unknown-linux-gnu.tar.gz"
+DROSERA_VERSION="v1.16.2"
+DROSERA_BINARY="drosera-operator-${DROSERA_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+DROSERA_URL="https://github.com/drosera-network/releases/releases/download/${DROSERA_VERSION}/${DROSERA_BINARY}"
 
-wget "$DOWNLOAD_URL" -O drosera-operator.tar.gz
+wget -O drosera-operator.tar.gz "$DROSERA_URL"
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to download Drosera Operator from $DOWNLOAD_URL."
+    echo "Error: Failed to download Drosera Operator."
     exit 1
 fi
 
@@ -143,12 +141,12 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Create drosera.toml configuration file
+# Create drosera.toml configuration file with correct field names
 echo "Creating configuration file 'drosera.toml'..."
 cat <<EOL > drosera.toml
-eth_rpc_url = "$ETH_RPC_URL"
-eth_private_key = "$PRIVATE_KEY"
-drosera_address = "$DROSERA_ADDRESS"
+rpc_url = "$ETH_RPC_URL"
+private_key = "$PRIVATE_KEY"
+contract_address = "$DROSERA_ADDRESS"
 EOL
 
 if [ $? -ne 0 ]; then
@@ -161,7 +159,6 @@ echo "Updating shell configuration..."
 if [ "$OS" == "Linux" ]; then
     SHELL_RC=~/.bashrc
 elif [ "$OS" == "Darwin" ]; then
-    # macOS typically uses zsh by default
     SHELL_RC=~/.zshrc
 fi
 
@@ -169,7 +166,7 @@ echo "export ETH_RPC_URL=\"$ETH_RPC_URL\"" >> "$SHELL_RC"
 echo "export PRIVATE_KEY=\"$PRIVATE_KEY\"" >> "$SHELL_RC"
 echo "export DROSERA_ADDRESS=\"$DROSERA_ADDRESS\"" >> "$SHELL_RC"
 
-# Source the configuration file to update current session
+# Source the configuration file to update the current session
 source "$SHELL_RC"
 
 # Start the Drosera Operator Node
