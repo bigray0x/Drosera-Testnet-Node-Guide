@@ -16,20 +16,12 @@ install_dependency() {
     if [ "$OS" == "Linux" ]; then
         sudo apt-get update
         sudo apt-get install -y "$1"
-        if [ $? -ne 0 ]; then
-            echo "Error: Failed to install $1 on Linux."
-            exit 1
-        fi
     elif [ "$OS" == "Darwin" ]; then
         if ! command -v brew &> /dev/null; then
             echo "Homebrew is required on macOS. Please install it from https://brew.sh."
             exit 1
         fi
         brew install "$1"
-        if [ $? -ne 0 ]; then
-            echo "Error: Failed to install $1 on macOS."
-            exit 1
-        fi
     else
         echo "Unsupported OS: $OS."
         exit 1
@@ -38,19 +30,7 @@ install_dependency() {
 
 # Check for necessary tools
 check_dependency wget
-check_dependency docker
 check_dependency curl
-
-# Function to deploy a Trap contract if needed (example using Foundry)
-generate_trap_address() {
-    echo "Deploying a new Trap contract using Foundry..."
-    forge create TrapContract --rpc-url "$ETH_RPC_URL" --private-key "$PRIVATE_KEY"
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to deploy the Trap contract."
-        exit 1
-    fi
-    echo "Trap contract deployed successfully!"
-}
 
 # -- NETWORK SELECTION --
 echo "Select the network to deploy on:"
@@ -114,11 +94,6 @@ if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
     exit 1
 fi
 
-# (Optional) If you want to auto-deploy a Trap contract when Drosera contract address is empty:
-if [ -z "$DROSERA_ADDRESS" ]; then
-    generate_trap_address
-fi
-
 # Download and extract Drosera Operator binary (latest version from GitHub)
 echo "Downloading Drosera Operator..."
 wget -O drosera-operator.tar.gz "https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz"
@@ -166,9 +141,9 @@ echo "export DROSERA_ADDRESS=\"$DROSERA_ADDRESS\"" >> "$SHELL_RC"
 # Source the configuration file to update current session
 source "$SHELL_RC"
 
-# Start the Drosera Operator Node (now using env variable for private key)
+# Start the Drosera Operator Node (now using `--eth-private-key` instead of `--private-key`)
 echo "Starting Drosera Operator Node..."
-drosera-operator node --private-key "$PRIVATE_KEY"
+drosera-operator node --eth-private-key "$PRIVATE_KEY"
 if [ $? -ne 0 ]; then
     echo "Error: Failed to start Drosera Operator."
     exit 1
