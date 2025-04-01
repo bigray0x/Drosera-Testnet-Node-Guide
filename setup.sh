@@ -1,152 +1,107 @@
 #!/bin/bash
 
-# Detect OS for later use
-OS=$(uname)
-
 # Function to check if a command exists
-check_dependency() {
-    if ! command -v "$1" &> /dev/null; then
-        echo "$1 is not installed. Installing..."
-        install_dependency "$1"
-    fi
+command_exists() {
+  command -v "$1" &>/dev/null
 }
 
-# Function to install dependencies based on the OS
-install_dependency() {
-    if [ "$OS" == "Linux" ]; then
-        sudo apt-get update
-        sudo apt-get install -y "$1"
-    elif [ "$OS" == "Darwin" ]; then
-        if ! command -v brew &> /dev/null; then
-            echo "Homebrew is required on macOS. Please install it from https://brew.sh."
-            exit 1
-        fi
-        brew install "$1"
-    else
-        echo "Unsupported OS: $OS."
-        exit 1
-    fi
+# Function to install required dependencies
+install_dependencies() {
+  if ! command_exists curl; then
+    echo "Installing curl..."
+    sudo apt-get update && sudo apt-get install -y curl
+  fi
+
+  if ! command_exists tar; then
+    echo "Installing tar..."
+    sudo apt-get install -y tar
+  fi
+
+  if ! command_exists jq; then
+    echo "Installing jq..."
+    sudo apt-get install -y jq
+  fi
 }
 
-# Check for necessary tools
-check_dependency wget
-check_dependency curl
+# Function to get public IP address
+get_public_ip() {
+  echo "Detecting public IP address..."
+  IP_ADDRESS=$(curl -s ifconfig.me)
+  echo "Public IP detected: $IP_ADDRESS"
+}
 
-# -- NETWORK SELECTION --
-echo "Select the network to deploy on:"
-echo "1) Holesky Testnet (default for Drosera Testnet)"
-echo "2) Ethereum Mainnet"
-echo "3) Sepolia Testnet"
-read -p "Enter your choice (1/2/3): " NETWORK_CHOICE
+# Function to configure Drosera settings
+configure_drosera() {
+  echo "Enter the Ethereum RPC URL [default: https://ethereum-holesky-rpc.publicnode.com]:"
+  read ETH_RPC_URL
+  ETH_RPC_URL=${ETH_RPC_URL:-"https://ethereum-holesky-rpc.publicnode.com"}
 
-case "$NETWORK_CHOICE" in
-    1)
-        NETWORK="Holesky"
-        DEFAULT_RPC="https://ethereum-holesky-rpc.publicnode.com"
-        DEFAULT_DROSERA_ADDRESS="0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8"
-        ;;
-    2)
-        NETWORK="Mainnet"
-        DEFAULT_RPC="https://mainnet.infura.io/v3/YOUR_API_KEY"
-        DEFAULT_DROSERA_ADDRESS="0xYOUR_MAINNET_CONTRACT_ADDRESS"
-        ;;
-    3)
-        NETWORK="Sepolia"
-        DEFAULT_RPC="https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY"
-        DEFAULT_DROSERA_ADDRESS="0xYOUR_SEPOLIA_CONTRACT_ADDRESS"
-        ;;
-    *)
-        echo "Invalid selection. Exiting..."
-        exit 1
-        ;;
-esac
+  echo "Enter your Ethereum private key (0x...):"
+  read -s ETH_PRIVATE_KEY
+  echo "Enter your Drosera contract address [default: 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8]:"
+  read DRO_CONTRACT_ADDR
+  DRO_CONTRACT_ADDR=${DRO_CONTRACT_ADDR:-"0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8"}
 
-echo "You selected: $NETWORK"
+  echo "Configuration Summary:"
+  echo "Network:              Holesky"
+  echo "Ethereum RPC URL:     $ETH_RPC_URL"
+  echo "Private Key:          (hidden for security)"
+  echo "Drosera Contract Addr:$DRO_CONTRACT_ADDR"
 
-# -- RPC URL INPUT --
-read -p "Enter your Ethereum RPC URL [$DEFAULT_RPC]: " ETH_RPC_URL
-ETH_RPC_URL=${ETH_RPC_URL:-$DEFAULT_RPC}
+  echo "Are these details correct? (y/n):"
+  read CONFIRM
+  if [[ $CONFIRM != "y" ]]; then
+    echo "Please re-enter the details."
+    configure_drosera
+  fi
+}
 
-# -- PRIVATE KEY INPUT (now visible) --
-read -p "Enter your Ethereum private key (0x...): " PRIVATE_KEY
+# Function to download and extract Drosera Operator
+download_drosera_operator() {
+  echo "Downloading Drosera Operator..."
+  wget https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz -O drosera-operator.tar.gz
+  tar -xzf drosera-operator.tar.gz
+  rm drosera-operator.tar.gz
+}
 
-# -- PRIVATE KEY VALIDATION --
-if [[ ! "$PRIVATE_KEY" =~ ^0x[a-fA-F0-9]{64}$ ]]; then
-    echo "Error: Invalid private key format. It must start with '0x' and be 64 hex characters long."
-    exit 1
-fi
+# Function to create 'drosera.toml' configuration file
+create_drosera_toml() {
+  echo "Creating configuration file 'drosera.toml'..."
 
-# -- DROSERA CONTRACT ADDRESS INPUT --
-read -p "Enter your Drosera contract address [$DEFAULT_DROSERA_ADDRESS]: " DROSERA_ADDRESS
-DROSERA_ADDRESS=${DROSERA_ADDRESS:-$DEFAULT_DROSERA_ADDRESS}
+  cat <<EOF > drosera.toml
+# Ethereum Network Configuration
+ethereum_rpc_url = "$ETH_RPC_URL"
+private_key = "$ETH_PRIVATE_KEY"
+drosera_contract_address = "$DRO_CONTRACT_ADDR"
+external_p2p_address = "$IP_ADDRESS"
+EOF
+}
 
-# Confirm inputs
-echo ""
-echo "Configuration Summary:"
-echo "Network:              $NETWORK"
-echo "Ethereum RPC URL:     $ETH_RPC_URL"
-echo "Private Key:          (hidden for security)"
-echo "Drosera Contract Addr:$DROSERA_ADDRESS"
-echo ""
-read -p "Are these details correct? (y/n): " CONFIRM
-if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
-    echo "Exiting. Please restart the script with correct inputs."
-    exit 1
-fi
+# Function to update shell configuration
+update_shell_configuration() {
+  echo "Updating shell configuration..."
 
-# Download and extract Drosera Operator binary (latest version from GitHub)
-echo "Downloading Drosera Operator..."
-wget -O drosera-operator.tar.gz "https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz"
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to download Drosera Operator."
-    exit 1
-fi
+  echo 'export ETH_RPC_URL="$ETH_RPC_URL"' >> ~/.bashrc
+  echo 'export DRO_CONTRACT_ADDR="$DRO_CONTRACT_ADDR"' >> ~/.bashrc
+  echo 'export IP_ADDRESS="$IP_ADDRESS"' >> ~/.bashrc
+  source ~/.bashrc
+}
 
-tar -xvf drosera-operator.tar.gz
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to extract Drosera Operator."
-    exit 1
-fi
+# Function to start Drosera Operator node
+start_drosera_operator() {
+  echo "Starting Drosera Operator Node..."
+  ./drosera-operator node --eth-private-key "$ETH_PRIVATE_KEY" --ethereum-rpc-url "$ETH_RPC_URL" --p2p-address "$IP_ADDRESS"
+}
 
-sudo mv drosera-operator /usr/local/bin/
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to move Drosera Operator to /usr/local/bin."
-    exit 1
-fi
+# Main function to execute the setup process
+main() {
+  install_dependencies
+  get_public_ip
+  configure_drosera
+  download_drosera_operator
+  create_drosera_toml
+  update_shell_configuration
+  start_drosera_operator
+}
 
-# Create drosera.toml configuration file (without private key)
-echo "Creating configuration file 'drosera.toml'..."
-cat <<EOL > drosera.toml
-eth_rpc_url = "$ETH_RPC_URL"
-drosera_address = "$DROSERA_ADDRESS"
-EOL
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to create configuration file."
-    exit 1
-fi
-
-# Update shell environment for persistence
-echo "Updating shell configuration..."
-if [ "$OS" == "Linux" ]; then
-    SHELL_RC=~/.bashrc
-elif [ "$OS" == "Darwin" ]; then
-    SHELL_RC=~/.zshrc
-fi
-
-echo "export ETH_RPC_URL=\"$ETH_RPC_URL\"" >> "$SHELL_RC"
-echo "export PRIVATE_KEY=\"$PRIVATE_KEY\"" >> "$SHELL_RC"
-echo "export DROSERA_ADDRESS=\"$DROSERA_ADDRESS\"" >> "$SHELL_RC"
-
-# Source the configuration file to update current session
-source "$SHELL_RC"
-
-# Start the Drosera Operator Node (now using `--eth-private-key` instead of `--private-key`)
-echo "Starting Drosera Operator Node..."
-drosera-operator node --eth-private-key "$PRIVATE_KEY"
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to start Drosera Operator."
-    exit 1
-fi
-
-echo "Drosera Operator setup complete! Your environment has been updated to include your variables."
+main
