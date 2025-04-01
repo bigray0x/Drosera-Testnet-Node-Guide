@@ -1,0 +1,1 @@
+# drosera-operator-setup-script
