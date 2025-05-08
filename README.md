@@ -317,6 +317,68 @@ docker rm drosera-node
 ```bash
 docker-compose up -d
 ```
+## Traps and Operator Update
+
+### Trap Update
+
+update trap configuration
+
+```bash
+cd $home && cd my-drosera-trap && nano drosera.toml
+```
+Change previous seed-node rpc to new one
+
+From 
+
+```bash
+"https://seed-node.testnet.drosera.io"
+```
+To 
+
+```bash
+"https://relay.testnet.drosera.io"
+```
+Control + X + Y + Enter to save.
+
+### Reapply to update configurations
+
+```bash
+DROSERA_PRIVATE_KEY=xxx drosera apply 
+```
+### Operator Update
+
+Kill nodes running in docker
+
+```bash
+docker-compose down
+```
+
+Update drosera operator cli
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+```
+
+```bash
+source /root/.bashrc
+```
+
+```bash
+foundryup
+```
+Pull latest docker image
+
+```bash
+docker pull ghcr.io/drosera-network/drosera-operator:latest
+```
+Restart your node to reflect latest chnages
+
+```bash
+docker-compose up -d
+```
+both operators and traps are now succesfully uodated.
+
+<img width="1440" alt="Screenshot 2025-05-08 at 6 06 20 PM" src="https://github.com/user-attachments/assets/2a1c31fd-babd-4f50-8996-184f22a835ff" />
 
 ## Debugging common Errors
 
