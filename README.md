@@ -251,7 +251,6 @@ nano docker-compose.yaml
 ## Paste the following file inside and replace RPC_URL_1 and RPC_URL_2 with your own RPCs.
 ```bash
 
-version: '3'
 services:
   drosera1:
     image: ghcr.io/drosera-network/drosera-operator:latest
