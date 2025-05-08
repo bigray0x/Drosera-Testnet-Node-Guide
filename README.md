@@ -170,7 +170,7 @@ cd ~
  ## Download The Operator Executable file
 
 ```bash
-https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
 ```
 
  ## Install the executable file 
