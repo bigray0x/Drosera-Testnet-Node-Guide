@@ -350,7 +350,7 @@ DROSERA_PRIVATE_KEY=xxx drosera apply
 Kill nodes running in docker
 
 ```bash
-docker-compose down
+cd Drosera-Network && docker-compose down
 ```
 
 Update drosera operator cli
