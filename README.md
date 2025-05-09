@@ -316,6 +316,27 @@ docker rm drosera-node
 ```bash
 docker-compose up -d
 ```
+
+### Opt-in 2nd Operator
+
+Method 1: Login with your 2nd Operator wallet in [Dashboard](app.drosera.io), and Opt-in to your Trap
+
+Method 2: via CLI
+
+operator 1 
+
+```bash
+drosera-operator optin --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key 1st_Operator_Privatekey --trap-config-address Trap_Address
+```
+operator 2 
+
+```bash
+drosera-operator optin --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key 2nd_Operator_Privatekey --trap-config-address Trap_Address
+```
+
+Replace 1st and 2nd_Operator_Privatekey & Trap_Address.
+
+
 ## Traps and Operator Update
 
 ### Trap Update
