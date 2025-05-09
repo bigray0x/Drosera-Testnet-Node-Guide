@@ -317,7 +317,7 @@ docker rm drosera-node
 docker-compose up -d
 ```
 
-### Opt-in 2nd Operator
+### Opt-in Operators
 
 Method 1: Login with your 2nd Operator wallet in [Dashboard](app.drosera.io), and Opt-in to your Trap
 
