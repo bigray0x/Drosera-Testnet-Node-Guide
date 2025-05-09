@@ -167,7 +167,7 @@ Your Trap should be private now with your operator address whitelisted internall
 cd ~
 ```
 
- ## Download The Operator Executable file
+ ## Download The Operator Executable file.
 
 ```bash
 curl -LO https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
