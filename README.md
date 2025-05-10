@@ -240,7 +240,7 @@ sudo docker run hello-world
 
 ```bash
 # create a folder for the operator node
-mkdir drosera-operator && cd drosera-operator 
+mkdir drosera-operator1 && cd drosera-operator1 
 ```
 
 ```bash
