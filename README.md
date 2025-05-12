@@ -161,7 +161,7 @@ DROSERA_PRIVATE_KEY=xxx drosera apply
 Your Trap should be private now with your operator address whitelisted internally.
 <img width="1057" alt="Screenshot 2025-04-29 at 9 58 14 AM" src="https://github.com/user-attachments/assets/8aa3bfc9-df06-4aa8-ab0a-33f81e652e71" />
 
-## Register Both operators
+## Register Both operators
 
 ```bash 
 cd ~
