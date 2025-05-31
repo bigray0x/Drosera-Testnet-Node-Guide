@@ -400,13 +400,13 @@ both operators and traps are now succesfully uodated.
 
 <img width="1440" alt="Screenshot 2025-05-08 at 6 06 20 PM" src="https://github.com/user-attachments/assets/2a1c31fd-babd-4f50-8996-184f22a835ff" />
 
-### How to get CADET role on discord :
+# How to get CADET role on discord :
 
 you have to Immortalize Discord username on-chain and Earn Cadet role!.
 
 - you have to first deploy a trap and run operator to do this part.
 
-- step 1 : create a new trap in your trap directory
+### step 1 : create a new trap in your trap directory
 Move to your trap directory:
 
 ```
@@ -453,7 +453,7 @@ contract Trap is ITrap {
 - Replace DISCORD_USERNAME with your discord username.
 - To save: Ctrl+X, Y & Enter
 
-- step 2 : Edit drosera.toml config
+### step 2 : Edit drosera.toml config
 ```
 nano drosera.toml
 ```
@@ -467,7 +467,7 @@ nano drosera.toml
 - the right format should look like this when done.
 - To save: Ctrl+X, Y & Enter.
 
-- step 3 : Deploy Trap
+### step 3 : Deploy Trap
 
 - Compile your Trap's Contract:
 
@@ -520,7 +520,7 @@ options:
 ~/.foundry/bin/forge build
 ```
 
-- step 4 : Verify Trap can respond :
+### step 4 : Verify Trap can respond :
 - 
 After the trap is deployed, we can check if the user has responded by calling the isResponder function on the response contract.
 
