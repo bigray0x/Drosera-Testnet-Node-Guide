@@ -400,6 +400,140 @@ both operators and traps are now succesfully uodated.
 
 <img width="1440" alt="Screenshot 2025-05-08 at 6 06 20 PM" src="https://github.com/user-attachments/assets/2a1c31fd-babd-4f50-8996-184f22a835ff" />
 
+### How to get CADET role on discord :
+
+you have to Immortalize Discord username on-chain and Earn Cadet role!.
+
+- you have to first deploy a trap and run operator to do this part.
+
+- step 1 : create a new trap in your trap directory
+Move to your trap directory:
+
+```
+cd my-drosera-trap
+```
+Create a new Trap.sol file:
+
+```
+nano src/Trap.sol
+```
+Paste the following contract code in it:
+
+```
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import {ITrap} from "drosera-contracts/interfaces/ITrap.sol";
+
+interface IMockResponse {
+    function isActive() external view returns (bool);
+}
+
+contract Trap is ITrap {
+    address public constant RESPONSE_CONTRACT = 0x4608Afa7f277C8E0BE232232265850d1cDeB600E;
+    string constant discordName = "DISCORD_USERNAME"; // add your discord name here
+
+    function collect() external view returns (bytes memory) {
+        bool active = IMockResponse(RESPONSE_CONTRACT).isActive();
+        return abi.encode(active, discordName);
+    }
+
+    function shouldRespond(bytes[] calldata data) external pure returns (bool, bytes memory) {
+        // take the latest block data from collect
+        (bool active, string memory name) = abi.decode(data[0], (bool, string));
+        // will not run if the contract is not active or the discord name is not set
+        if (!active || bytes(name).length == 0) {
+            return (false, bytes(""));
+        }
+
+        return (true, abi.encode(name));
+    }
+}
+```
+- Replace DISCORD_USERNAME with your discord username.
+- To save: Ctrl+X, Y & Enter
+
+- step 2 : Edit drosera.toml config
+```
+nano drosera.toml
+```
+- Modify the values of the specified variables as follows:
+- path = "out/Trap.sol/Trap.json"
+- response_contract = "0x4608Afa7f277C8E0BE232232265850d1cDeB600E"
+- response_function = "respondWithDiscordName(string)"
+  
+![Image 5-31-25 at 10 01 AM](https://github.com/user-attachments/assets/5fb1624d-a2ec-4fe0-b69f-7e5b35847109)
+
+- the right format should look like this when done.
+- To save: Ctrl+X, Y & Enter.
+
+- step 3 : Deploy Trap
+
+- Compile your Trap's Contract:
+
+```
+forge build
+```
+
+- Test the trap before deploying:
+- 
+```
+drosera dryrun
+```
+- Apply and Deploy the Trap:
+
+```
+DROSERA_PRIVATE_KEY=xxx drosera apply
+```
+Replace xxx with your EVM wallet privatekey (Ensure it's funded with Holesky ETH)
+Enter the command, when prompted, write ofc and press Enter.
+
+- if you get this error below :
+
+```
+root@vmi2289783:~/my-drosera-trap# forge build
+
+FORGE - training program for SNAP (version 2006-07-28)
+
+usage: forge [options] <ann> <dna> [options]
+options:
+  -help
+  -verbose
+  -pseudocount <float>  [1]   (absolute number for all models)
+  -pseudoCoding <float> [0.0] (eg. 0.05)
+  -pseudoIntron <float> [0.0]
+  -pseudoInter <float>  [0.0]
+  -min-counts           [0]
+  -lcmask [-fragmentN]
+  -utr5-length <int>    [50]
+  -utr5-offset <int>    [10]
+  -utr3-length <int>    [50]
+  -utr3-offset <int>    [10]
+  -explicit <int>       [250]
+  -min-intron <int>     [30]
+  -boost <file>  (file of ID <int>)
+```
+
+- use this to build instead :
+
+```
+~/.foundry/bin/forge build
+```
+
+- step 4 : Verify Trap can respond :
+- 
+After the trap is deployed, we can check if the user has responded by calling the isResponder function on the response contract.
+
+```
+cast call 0x4608Afa7f277C8E0BE232232265850d1cDeB600E "isResponder(address)(bool)" OWNER_ADDRESS --rpc-url https://ethereum-holesky-rpc.publicnode.com
+```
+Replace OWNER_ADDRESS with your Trap's owner address. (Your main address that has deployed the Trap's contract)
+If you receive true as a response, it means you have successfully completed all the steps.
+image
+
+- you may get false if you check immediately after deployment.
+- It may take a 2-5 minutes to successfully receive "true" as a response.
+
 ## Debugging common Errors
 
 1. operator config timeout not elapsed when trying to apply : simply wait and try after 15mins.
