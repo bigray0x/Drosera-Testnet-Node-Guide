@@ -476,7 +476,7 @@ forge build
 ```
 
 - Test the trap before deploying:
-- 
+
 ```
 drosera dryrun
 ```
@@ -521,7 +521,7 @@ options:
 ```
 
 ### step 4 : Verify Trap can respond :
-- 
+
 After the trap is deployed, we can check if the user has responded by calling the isResponder function on the response contract.
 
 ```
@@ -534,6 +534,7 @@ image
 - you may get false if you check immediately after deployment.
 - It may take a 2-5 minutes to successfully receive "true" as a response.
 
+now wait for the role to be automatically assigned.
 ## Debugging common Errors
 
 1. operator config timeout not elapsed when trying to apply : simply wait and try after 15mins.
