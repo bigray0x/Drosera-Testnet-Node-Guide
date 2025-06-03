@@ -534,6 +534,13 @@ image
 - you may get false if you check immediately after deployment.
 - It may take a 2-5 minutes to successfully receive "true" as a response.
 
+### step 5 : Verify Name Onchain :
+
+```
+source /root/.bashrc
+cast call 0x4608Afa7f277C8E0BE232232265850d1cDeB600E "getDiscordNamesBatch(uint256,uint256)(string[])" 0 2000 --rpc-url https://ethereum-holesky-rpc.publicnode.com/
+```
+
 now wait for the role to be automatically assigned.
 ## Debugging common Errors
 
