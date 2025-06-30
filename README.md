@@ -491,10 +491,6 @@ Enter the command, when prompted, write ofc and press Enter.
 - if you get this error below :
 
 ```
-root@vmi2289783:~/my-drosera-trap# forge build
-
-FORGE - training program for SNAP (version 2006-07-28)
-
 usage: forge [options] <ann> <dna> [options]
 options:
   -help
@@ -542,6 +538,201 @@ cast call 0x4608Afa7f277C8E0BE232232265850d1cDeB600E "getDiscordNamesBatch(uint2
 ```
 
 now wait for the role to be automatically assigned.
+
+## Drosera Node Migration Guide From Holesky To Hoodi
+
+
+- if you participated in the last task to get cadet role you’ll need to redeploy your trap to complete this migration. 
+
+How to migrate in 6 steps.
+
+### Step 1 : it’s important to back up your old trap config file details to use in the next steps.
+
+```
+cd ~/my-drosera-trap
+nano drosera.toml 
+```
+
+- Copy everything you see here and save it in notes or anywhere you feel comfortable.
+
+- Control X to exit.
+
+```
+cd ~ 
+```
+
+- remove the old trap file 
+
+```
+sudo rm -rf my-drosera-trap
+```
+
+Step 2 : redeploy your trap and restore your trap file
+
+- Recreate the trap folder 
+
+```
+mkdir my-drosera-trap
+cd ~/my-drosera-trap
+```
+
+- Replace this lines below with your actual GitHub username and email.
+
+```
+git config --global user.email "Github_Email"
+git config --global user.name "Github_Username"
+```
+
+- Now redeploy the trap 🪤
+
+```
+forge init -t drosera-network/trap-foundry-template
+```
+
+- If you get this error below ⬇️ 
+
+```
+usage: forge [options] <ann> <dna> [options]
+options:
+  -help
+  -verbose
+  -pseudocount <float>  [1]   (absolute number for all models)
+  -pseudoCoding <float> [0.0] (eg. 0.05)
+  -pseudoIntron <float> [0.0]
+  -pseudoInter <float>  [0.0]
+  -min-counts           [0]
+  -lcmask [-fragmentN]
+  -utr5-length <int>    [50]
+  -utr5-offset <int>    [10]
+  -utr3-length <int>    [50]
+  -utr3-offset <int>    [10]
+  -explicit <int>       [250]
+  -min-intron <int>     [30]
+  -boost <file>  (file of ID <int>)
+  ```
+- Do this
+
+```
+~/.foundry/bin/forge build
+```
+
+- If that doesn’t fix it then reinstall bun and forge 
+
+```
+curl -fsSL https://bun.sh/install | bash
+source /root/.bashrc
+bun install
+forge build
+```
+
+Step 3 : restore your old trap file 
+```
+cd my-drosera-trap && rm drosera.toml && nano drosera.toml
+```
+
+- Paste back your old drosera.toml file details now.
+
+- Replace this lines below in the replaced file:
+
+
+```
+drosera_rpc = "https://relay.testnet.drosera.io"
+eth_chain_id = 17000
+drosera_address = "0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8"
+```
+
+- With this
+
+```
+drosera_rpc = "https://relay.hoodi.drosera.io"
+eth_chain_id = 560048
+drosera_address = "0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D"
+```
+
+Step 4 : apply the changes
+
+```
+DROSERA_PRIVATE_KEY=your_private_key drosera apply
+```
+- you’re applying using the original private key you used to deploy the trap. 
+- open the file after applying and copy your new trap address and save it.
+
+
+Step 5 : update your operator docker file and configurations
+
+```
+cd drosera-operator1 && docker pull ghcr.io/drosera-network/drosera-operator:latest && docker compose down
+```
+
+- Update the toml config file
+
+```
+nano docker-compose.yaml
+```
+
+- hold control + k down until the file is wiped complete
+
+- Then paste this new configuration details into it.
+
+```
+version: '3'
+services:
+  drosera1:
+    image: ghcr.io/drosera-network/drosera-operator:latest
+    container_name: drosera-node1
+    network_mode: host
+    volumes:
+      - drosera_data1:/data
+    command: node --db-file-path /data/drosera.db --network-p2p-port 31313 --server-port 31314 --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-backup-rpc-url https://hoodi.drpc.org --drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D --eth-private-key ${ETH_PRIVATE_KEY} --listen-address 0.0.0.0 --network-external-p2p-address ${VPS_IP} --disable-dnr-confirmation true
+    restart: always
+
+  drosera2:
+    image: ghcr.io/drosera-network/drosera-operator:latest
+    container_name: drosera-node2
+    network_mode: host
+    volumes:
+      - drosera_data2:/data
+    command: node --db-file-path /data/drosera.db --network-p2p-port 31315 --server-port 31316 --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-backup-rpc-url https://hoodi.drpc.org --drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D --eth-private-key ${ETH_PRIVATE_KEY2} --listen-address 0.0.0.0 --network-external-p2p-address ${VPS_IP} --disable-dnr-confirmation true
+    restart: always
+
+volumes:
+  drosera_data1:
+  drosera_data2:
+  ```
+
+- Now save the file using control + X, y and enter.
+
+Step 6 : register and opt-in operators on hoodi network
+
+-> Opt in both operators
+
+- opt-in key 1:
+  
+```
+drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key2_here --trap-config-address your_trap_address_here
+```
+- opt-in key 2:
+```
+drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here --trap-config-address your_trap_address_here
+  ```
+-> Register both operators:
+
+- register key 1:
+```
+drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
+  ```
+- register key 2:
+
+```
+drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key2_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
+  ```
+- Then rerun the node
+```
+docker-compose down && docker compose up -d
+```
+you should be up and running now
+
+
 ## Debugging common Errors
 
 1. operator config timeout not elapsed when trying to apply : simply wait and try after 15mins.
