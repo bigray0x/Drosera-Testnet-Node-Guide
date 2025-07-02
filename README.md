@@ -170,13 +170,13 @@ cd ~
  ## Download The Operator Executable file.
 
 ```bash
-curl -LO https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/drosera-network/releases/releases/download/v0.20.0/drosera-operator-v0.20.0-x86_64-unknown-linux-gnu.tar.gz
 ```
 
  ## Install the executable file 
 
 ```bash
-tar -xvf drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
+tar -xvf drosera-operator-v0.20.0-x86_64-unknown-linux-gnu.tar.gz
 ```
 
 Test the CLI with ./drosera-operator --version to verify it's working.
@@ -207,11 +207,11 @@ docker pull ghcr.io/drosera-network/drosera-operator:latest
 ## Register Operators
 
 ```bash
-drosera-operator register --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key PV_KEY1
+drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
 ```
 
 ```bash 
-drosera-operator register --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key PV_KEY2
+drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key2_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
 ```
 
 * Replace PV_KEY1 and PV_KEY2 with your Operator EVM privatekeys.
@@ -251,6 +251,7 @@ nano docker-compose.yaml
 ## Paste the following file inside and replace RPC_URL_1 and RPC_URL_2 with your own RPCs.
 ```bash
 
+version: '3'
 services:
   drosera1:
     image: ghcr.io/drosera-network/drosera-operator:latest
@@ -258,7 +259,7 @@ services:
     network_mode: host
     volumes:
       - drosera_data1:/data
-    command: node --db-file-path /data/drosera.db --network-p2p-port 31313 --server-port 31314 --eth-rpc-url RPC_URL_1 --eth-backup-rpc-url https://holesky.drpc.org --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 --eth-private-key ${ETH_PRIVATE_KEY} --listen-address 0.0.0.0 --network-external-p2p-address ${VPS_IP} --disable-dnr-confirmation true
+    command: node --db-file-path /data/drosera.db --network-p2p-port 31313 --server-port 31314 --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-backup-rpc-url https://hoodi.drpc.org --drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D --eth-private-key ${ETH_PRIVATE_KEY} --listen-address 0.0.0.0 --network-external-p2p-address ${VPS_IP} --disable-dnr-confirmation true
     restart: always
 
   drosera2:
@@ -267,7 +268,7 @@ services:
     network_mode: host
     volumes:
       - drosera_data2:/data
-    command: node --db-file-path /data/drosera.db --network-p2p-port 31315 --server-port 31316 --eth-rpc-url RPC_URL_2 --eth-backup-rpc-url https://holesky.drpc.org --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 --eth-private-key ${ETH_PRIVATE_KEY2} --listen-address 0.0.0.0 --network-external-p2p-address ${VPS_IP} --disable-dnr-confirmation true
+    command: node --db-file-path /data/drosera.db --network-p2p-port 31315 --server-port 31316 --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-backup-rpc-url https://hoodi.drpc.org --drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D --eth-private-key ${ETH_PRIVATE_KEY2} --listen-address 0.0.0.0 --network-external-p2p-address ${VPS_IP} --disable-dnr-confirmation true
     restart: always
 
 volumes:
@@ -276,13 +277,6 @@ volumes:
 ```
 
 Save the file by doing Ctrl + X + Y + Enter.
-
-## Stop and remove old Drosera System Nodes
-
- ```bash
-sudo systemctl stop drosera
-sudo systemctl disable drosera
-```
 
 ## Edit the .ENV file.
 
@@ -303,14 +297,6 @@ SERVER_PORT2=31316
 ```
 Save with Ctrl + X + Y + enter.
 
-## Stop and remove old drosera nodes 
-
-```bash
-docker compose down -v
-docker stop drosera-node
-docker rm drosera-node
-```
-
 ## Run the both operator nodes
 
 ```bash
@@ -326,79 +312,15 @@ Method 2: via CLI
 operator 1 
 
 ```bash
-drosera-operator optin --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key 1st_Operator_Privatekey --trap-config-address Trap_Address
+drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here --trap-config-address your_trap_address_here
 ```
 operator 2 
 
 ```bash
-drosera-operator optin --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key 2nd_Operator_Privatekey --trap-config-address Trap_Address
+drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key2_here --trap-config-address your_trap_address_here
 ```
 
 Replace 1st and 2nd_Operator_Privatekey & Trap_Address.
-
-
-## Traps and Operator Update
-
-### Trap Update
-
-update trap configuration
-
-```bash
-cd $home && cd my-drosera-trap && nano drosera.toml
-```
-Change previous seed-node rpc to new one
-
-From 
-
-```bash
-"https://seed-node.testnet.drosera.io"
-```
-To 
-
-```bash
-"https://relay.testnet.drosera.io"
-```
-Control + X + Y + Enter to save.
-
-### Reapply to update configurations
-
-```bash
-DROSERA_PRIVATE_KEY=xxx drosera apply 
-```
-### Operator Update
-
-Kill nodes running in docker
-
-```bash
-cd Drosera-Network && docker-compose down
-```
-
-Update drosera operator cli
-
-```bash
-curl -L https://foundry.paradigm.xyz | bash
-```
-
-```bash
-source /root/.bashrc
-```
-
-```bash
-foundryup
-```
-Pull latest docker image
-
-```bash
-docker pull ghcr.io/drosera-network/drosera-operator:latest
-```
-Restart your node to reflect latest chnages
-
-```bash
-docker-compose up -d
-```
-both operators and traps are now succesfully uodated.
-
-<img width="1440" alt="Screenshot 2025-05-08 at 6 06 20 PM" src="https://github.com/user-attachments/assets/2a1c31fd-babd-4f50-8996-184f22a835ff" />
 
 # How to get CADET role on discord :
 
