@@ -170,13 +170,13 @@ cd ~
  ## Download The Operator Executable file.
 
 ```bash
-curl -LO https://github.com/drosera-network/releases/releases/download/v0.20.0/drosera-operator-v0.20.0-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/drosera-network/releases/releases/download/v1.20.0/drosera-operator-v1.20.0-x86_64-unknown-linux-gnu.tar.gz
 ```
 
  ## Install the executable file 
 
 ```bash
-tar -xvf drosera-operator-v0.20.0-x86_64-unknown-linux-gnu.tar.gz
+tar -xvf drosera-operator-v1.20.0-x86_64-unknown-linux-gnu.tar.gz
 ```
 
 Test the CLI with ./drosera-operator --version to verify it's working.
