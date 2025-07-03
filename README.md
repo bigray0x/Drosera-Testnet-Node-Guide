@@ -248,7 +248,7 @@ mkdir drosera-operator1 && cd drosera-operator1
 nano docker-compose.yaml
 ```
 
-## Paste the following file inside and replace RPC_URL_1 and RPC_URL_2 with your own RPCs.
+## Paste the following file inside.
 ```bash
 
 version: '3'
