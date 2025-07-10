@@ -654,7 +654,33 @@ docker-compose down && docker compose up -d
 ```
 you should be up and running now
 
+# How to add more operators to your Trap.
 
+```
+cd my-drosera-trap
+nano drosera.toml
+```
+
+- change this line:
+```
+max_number_of_operators = 2
+```
+- to the number of preferred operators you want, e.g 8:
+```
+max_number_of_operators = 8
+```
+- and this line 
+```
+whitelist = ["Operator_Address_1","Operator_address_2"]
+```
+- to
+```
+whitelist = ["Operator_Address_1","Operator_address_2""Operator_address_3”, "Operator_address_4”,”….till you get to 8”]
+```
+- after whitelisting 8 operator addresses you can then apply the changes:
+```
+DROSERA_PRIVATE_KEY=your_private_key drosera apply
+```
 ## Debugging common Errors
 
 1. operator config timeout not elapsed when trying to apply : simply wait and try after 15mins.
