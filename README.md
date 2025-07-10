@@ -840,8 +840,7 @@ save using control + x,y and enter.
 
 - Register all operator addresses and opt them in:
 
-•claim hoodi faucet before you start. (hoodi faucet)[https://hoodifaucet.io]
-
+•claim hoodi faucet before you start. (hoodi faucet)[https://hoodifaucet.io].
 - register key 1:
 ```
 drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
