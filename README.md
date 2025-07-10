@@ -124,7 +124,7 @@ Deploy the Trap :
 ```bash
 DROSERA_PRIVATE_KEY=xxx drosera apply
 ```
-* Replace xxx with your EVM wallet privatekey (Ensure it's funded with Holesky ETH, you can claim 1E from holeskyfaucet.io)
+* Replace xxx with your EVM wallet privatekey (Ensure it's funded with Hoodi ETH, you can claim 1E from hoodifaucet.io)
 * If you encounter rpc issues use this format instead “DROSERA_PRIVATE_KEY=xxx drosera apply --eth-rpc-url your_rpc_here”
 * Use the private RPCs you got incase of errors.
 * Enter the command, when prompted, write ofc and press Enter.
@@ -322,7 +322,7 @@ drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com -
 
 Replace 1st and 2nd_Operator_Privatekey & Trap_Address.
 
-# How to get CADET role on discord :
+# How to get CADET role on discord (ENDED):
 
 you have to Immortalize Discord username on-chain and Earn Cadet role!.
 
