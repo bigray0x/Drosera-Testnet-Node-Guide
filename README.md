@@ -781,9 +781,93 @@ save using ```control + x, y & enter```
 
 - update your .env file.
 
+```
+nano .env
+```
+- change this:
+```bash
+ETH_PRIVATE_KEY=
+ETH_PRIVATE_KEY2=
+VPS_IP=
+P2P_PORT1=31313
+SERVER_PORT1=31314
+P2P_PORT2=31315
+SERVER_PORT2=31316
+```
 
+- to this:
+```
+# Ethereum private keys
+ETH_PRIVATE_KEY=
+ETH_PRIVATE_KEY2=
+ETH_PRIVATE_KEY3=
+ETH_PRIVATE_KEY4=
+ETH_PRIVATE_KEY5=
+ETH_PRIVATE_KEY6=
+ETH_PRIVATE_KEY7=
+ETH_PRIVATE_KEY8=
 
+# VPS IP address (shared across all nodes)
+VPS_IP=
 
+# P2P and server ports
+P2P_PORT1=31313
+SERVER_PORT1=31314
+
+P2P_PORT2=31315
+SERVER_PORT2=31316
+
+P2P_PORT3=31317
+SERVER_PORT3=31318
+
+P2P_PORT4=31319
+SERVER_PORT4=31320
+
+P2P_PORT5=31321
+SERVER_PORT5=31322
+
+P2P_PORT6=31323
+SERVER_PORT6=31324
+
+P2P_PORT7=31325
+SERVER_PORT7=31326
+
+P2P_PORT8=31327
+SERVER_PORT8=31328
+```
+
+save using control + x,y and enter.
+
+- Register all operator addresses and opt them in:
+
+•claim hoodi faucet before you start. (hoodi faucet)[https://hoodifaucet.io]
+
+- register key 1:
+```
+drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
+  ```
+- register key 2:
+
+```
+• continue until you register all 8.
+
+- opt-in key 1:
+  
+```
+drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key2_here --trap-config-address your_trap_address_here
+```
+- opt-in key 2:
+```
+drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here --trap-config-address your_trap_address_here
+  ```
+• continue until you opt them all in. 
+
+- now remove the existing drosera node and rerun with latest one:
+```
+docker-compose down && docker compose up -d
+```
+
+• all 8 addreses should be opted in and fully functional.
 ## Debugging common Errors
 
 1. operator config timeout not elapsed when trying to apply : simply wait and try after 15mins.
