@@ -846,7 +846,9 @@ save using control + x,y and enter.
 drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
 ```
 - register key 2:
-
+```
+drosera-operator register --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key2_here –-drosera-address 0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D
+```
 • continue until you register all 8.
 
 - opt-in key 1:
