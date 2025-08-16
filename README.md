@@ -858,7 +858,7 @@ drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com -
 - opt-in key 2:
 ```
 drosera-operator optin --eth-rpc-url https://ethereum-hoodi-rpc.publicnode.com --eth-private-key your_private_key1_here --trap-config-address your_trap_address_here
-  ```
+```
 • continue until you opt them all in. 
 
 - now remove the existing drosera node and rerun with latest one:
